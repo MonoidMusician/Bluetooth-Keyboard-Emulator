@@ -10,20 +10,20 @@ import AppKit
 import Foundation
 import IOBluetooth
 
-func myCGEventCallback(proxy : CGEventTapProxy,
+func myCGEventCallback(_ proxy : CGEventTapProxy,
                        type : CGEventType,
                        event : CGEvent,
-                       refcon : UnsafeMutablePointer<Void>) -> Unmanaged<CGEvent>? {
+                       refcon : UnsafeMutableRawPointer) -> Unmanaged<CGEvent>? {
 
-    let btKey = UnsafeMutablePointer<BTKeyboard>(refcon).memory
+    let btKey = UnsafeMutablePointer<BTKeyboard>(refcon).pointee
     switch type {
-    case .KeyUp:
-        if let nsEvent = NSEvent(CGEvent: event) {
+    case .keyUp:
+        if let nsEvent = NSEvent(cgEvent: event) {
             btKey.sendKey(-1, nsEvent.modifierFlags.rawValue)
         }
         break
-    case .KeyDown:
-        if let nsEvent = NSEvent(CGEvent: event) {
+    case .keyDown:
+        if let nsEvent = NSEvent(cgEvent: event) {
             btKey.sendKey(Int(nsEvent.keyCode), nsEvent.modifierFlags.rawValue)
         }
         break
@@ -38,7 +38,7 @@ var btKey: BTKeyboard?
 
 class AppDelegate: NSObject, NSApplicationDelegate {
 
-    func applicationDidBecomeActive(notification: NSNotification) {
+    func applicationDidBecomeActive(_ notification: Notification) {
         btKey = BTKeyboard()
 
         if !AXIsProcessTrusted() {
@@ -47,23 +47,23 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         // capture all key events
         var eventMask: CGEventMask = 0
-        eventMask |= (1 << CGEventMask(CGEventType.KeyUp.rawValue))
-        eventMask |= (1 << CGEventMask(CGEventType.KeyDown.rawValue))
-        eventMask |= (1 << CGEventMask(CGEventType.FlagsChanged.rawValue))
+        eventMask |= (1 << CGEventMask(CGEventType.keyUp.rawValue))
+        eventMask |= (1 << CGEventMask(CGEventType.keyDown.rawValue))
+        eventMask |= (1 << CGEventMask(CGEventType.flagsChanged.rawValue))
 
-        if let eventTap = CGEventTapCreate(.CGSessionEventTap,
-                                           .HeadInsertEventTap,
-                                           .Default,
-                                           eventMask,
-                                           myCGEventCallback,
-                                           &btKey) {
+        if let eventTap = CGEvent.tapCreate(tap: .cgSessionEventTap,
+                                           place: .headInsertEventTap,
+                                           options: .defaultTap,
+                                           eventsOfInterest: eventMask,
+                                           callback: myCGEventCallback as! CGEventTapCallBack,
+                                           userInfo: &btKey) {
             let runLoopSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, eventTap, 0)
-            CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource, kCFRunLoopCommonModes)
-            CGEventTapEnable(eventTap, true)
+            CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource, CFRunLoopMode.commonModes)
+            CGEvent.tapEnable(tap: eventTap, enable: true)
         }
     }
 
-    func applicationWillTerminate(aNotification: NSNotification) {
+    func applicationWillTerminate(_ aNotification: Notification) {
         btKey?.terminate()
     }
 }

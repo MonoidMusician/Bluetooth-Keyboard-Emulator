@@ -9,7 +9,7 @@
 import IOKit.hid // hid keys
 import Carbon.HIToolbox // virtual keys
 
-func virtualKeyCodeToHIDKeyCode(vKeyCode: Int) -> Int {
+func virtualKeyCodeToHIDKeyCode(_ vKeyCode: Int) -> Int {
    switch vKeyCode {
    case kVK_ANSI_A: return kHIDUsage_KeyboardA
    case kVK_ANSI_B: return kHIDUsage_KeyboardB
