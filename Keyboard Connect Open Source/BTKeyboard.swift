@@ -172,19 +172,19 @@ class BTKeyboard: IOBluetoothL2CAPChannelDelegate {
     func sendKey(_ vkeyCode: Int, _ modifierRawValue: UInt) {
         let keyCode = UInt8(virtualKeyCodeToHIDKeyCode(vkeyCode))
 
-        let vmodifier = NSEventModifierFlags(rawValue: modifierRawValue)
+        let vmodifier = NSEvent.ModifierFlags(rawValue: modifierRawValue)
         var modifier: UInt8 = 0
 
-        if vmodifier.contains(NSEventModifierFlags.command) {
+        if vmodifier.contains(NSEvent.ModifierFlags.command) {
             modifier |= (1 << 3)
         }
-        if vmodifier.contains(NSEventModifierFlags.option) {
+        if vmodifier.contains(NSEvent.ModifierFlags.option) {
             modifier |= (1 << 2)
         }
-        if vmodifier.contains(NSEventModifierFlags.shift) {
+        if vmodifier.contains(NSEvent.ModifierFlags.shift) {
             modifier |= (1 << 1)
         }
-        if vmodifier.contains(NSEventModifierFlags.control) {
+        if vmodifier.contains(NSEvent.ModifierFlags.control) {
             modifier |= 1
         }
 
