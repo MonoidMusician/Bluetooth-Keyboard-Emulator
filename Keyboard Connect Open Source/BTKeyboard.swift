@@ -178,7 +178,7 @@ class BTKeyboard: IOBluetoothL2CAPChannelDelegate {
         if vmodifier.contains(NSEventModifierFlags.command) {
             modifier |= (1 << 3)
         }
-        if vmodifier.contains(NSEventModifierFlags.AlternateKeyMask) {
+        if vmodifier.contains(NSEventModifierFlags.option) {
             modifier |= (1 << 2)
         }
         if vmodifier.contains(NSEventModifierFlags.shift) {
@@ -196,7 +196,7 @@ class BTKeyboard: IOBluetoothL2CAPChannelDelegate {
     }
 
     @objc func l2capChannelData(_ channel: IOBluetoothL2CAPChannel!, data dataPointer: UnsafeMutableRawPointer!, length dataLength: Int) {
-        let data = UnsafeBufferPointer<UInt8>(start:UnsafePointer<UInt8>(dataPointer), count:dataLength)
+        let data = UnsafeBufferPointer<UInt8>(start:UnsafePointer<UInt8>(OpaquePointer(dataPointer)), count:dataLength)
 
         if channel.psm == BTChannels.Control {
             guard data.count > 0 else

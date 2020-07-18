@@ -15,7 +15,7 @@ func myCGEventCallback(_ proxy : CGEventTapProxy,
                        event : CGEvent,
                        refcon : UnsafeMutableRawPointer) -> Unmanaged<CGEvent>? {
 
-    let btKey = UnsafeMutablePointer<BTKeyboard>(refcon).pointee
+    let btKey = UnsafeMutablePointer<BTKeyboard>(OpaquePointer(refcon)).pointee
     switch type {
     case .keyUp:
         if let nsEvent = NSEvent(cgEvent: event) {
